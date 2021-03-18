@@ -12,8 +12,8 @@
               
                 <table class="table">
                     <tr>
-                        <th><h5>Items:<strong>3</strong></h5></th>
-                        <th><h5>Total:<strong>42$</strong></h5></th>
+                        <th><h5>Items:<strong>{{ order.finalItemNum }}</strong></h5></th>
+                        <th><h5>Total:<strong>${{ order.finalPrice }}</strong></h5></th>
                         <th>
                             <a  class="btn btn-success" style="float:right;margin:5px;" href={% url 'checkout' %}>Checkout</a>
 
@@ -33,20 +33,24 @@
                     <div style="flex:1"><strong>Quantity:</strong></div>
                     <div style="flex:1"><strong>Total</strong></div>
                 </div>
-
+                {% for item in items  %}
+                
                 <div class = "cart-row">
-                    <div style="flex:2"><img class="row-image" src ={% static 'images/placeholder.png' %}/> </div>
-                    <div style="flex:2">product 1</div>
-                    <div style="flex:1">$20</div>
+                    <div style="flex:2"><img class="row-image" src ={{ item.product.imageURL }}/> </div>
+                    <div style="flex:2">{{ item.product.name }} </div>
+                    <div style="flex:1">${{ item.product.price }}</div>
                     <div style="flex:1">
-                        <p class="quantity">2</p>
+                        <p class="quantity">{{ item.quantity }}</p>
                         <div class="quantity">
                             <img class="chg-quantity" src = {% static 'images/arrow-up.png' %}>
                             <img class="chg-quantity" src = {% static 'images/arrow-down.png' %}>
                         </div>
                     </div>
-                    <div style="flex:1">$20</div>
+                    <div style="flex:1"> {{ item.totPrice }} </div>
                 </div>
+                
+                {% endfor %}
+                
             </div>
         
         </div>

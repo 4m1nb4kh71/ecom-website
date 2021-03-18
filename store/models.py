@@ -34,6 +34,21 @@ class Order(models.Model):
     date_ordered=models.DateField(auto_now_add=True)
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100,null=True)
+
+    @property
+    def finalPrice(self):
+        orderitems = self.orderitem_set.all()
+        finPrice = sum([item.totPrice for item in orderitems])
+
+        return finPrice
+
+    @property
+    def finalItemNum(self):
+        orderitems = self.orderitem_set.all()
+        finNum = sum([item.quantity for item in orderitems])
+
+        return finNum
+
     def __str__(self):
         return str(self.id)
 
@@ -42,6 +57,11 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order,on_delete=models.SET_NULL,null=True)
     quantity = models.IntegerField(default=0,null=True,blank=True)
     date_added = models.DateField(auto_now_add=True)
+
+    @property
+    def totPrice (self):
+        price = self.quantity * self.product.price
+        return price
     
     
 class ShippingAddress(models.Model):
