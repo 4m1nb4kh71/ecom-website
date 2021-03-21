@@ -39,8 +39,8 @@ class Order(models.Model):
     def finalPrice(self):
         orderitems = self.orderitem_set.all()
         finPrice = sum([item.totPrice for item in orderitems])
-
-        return finPrice
+        finPrice = round(finPrice,2)
+        return finPrice 
 
     @property
     def finalItemNum(self):
@@ -60,7 +60,8 @@ class OrderItem(models.Model):
 
     @property
     def totPrice (self):
-        price = self.quantity * self.product.price
+        price = round(self.quantity * self.product.price,2)
+        
         return price
     
     
