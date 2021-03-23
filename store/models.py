@@ -19,10 +19,10 @@ class Product (models.Model):
 
     @property
     def imageURL(self):
-        if(self.image==None):
-            url='/images/placeholder.png'
-        else:
+        if(self.image):
             url = self.image.url
+        else:
+            url='/images/placeholder.png'
         return url
 
     def __str__(self):
@@ -49,8 +49,19 @@ class Order(models.Model):
 
         return finNum
 
+    @property
+    def shipping(self):
+        shipping = False
+        orderitems = self.orderitem_set.all()
+        for i in orderitems :
+            if i.product.digital == False:
+                shipping = True
+        return shipping
+
     def __str__(self):
         return str(self.id)
+
+    
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL,null=True)

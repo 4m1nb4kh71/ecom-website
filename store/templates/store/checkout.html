@@ -80,4 +80,14 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        var shipping = document.getElementById('shipping-info')
+
+        var shipping = '{{order.shipping}}'
+
+        if ( shipping == 'False' )
+        {
+            document.getElementById('shipping-info').innerHTML = ''
+        }
+    </script>
 {% endblock content %}

@@ -5,8 +5,18 @@ import json
 # Create your views here.
 
 def store (request):
+
+    if (request.user.is_authenticated):
+        customer = request.user.customer
+        order , created = Order.objects.get_or_create(customer=customer,complete=False)
+        items = order.orderitem_set.all() 
+        cartItems = order.finalItemNum  
+    else :
+        items=[] 
+        cartItems = order.finalItemNum  
+
     Products = Product.objects.all()
-    context = {'products': Products}
+    context = {'products': Products , 'cartitems':cartItems}
     return render(request,'store/store.html',context)
 
 def cart (request):
@@ -14,10 +24,12 @@ def cart (request):
         customer = request.user.customer
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all()
+        cartItems = order.finalItemNum  
     else :
         items=[]
+        order = []
     
-    context = {'items':items ,'order':order}
+    context = {'items':items ,'order':order ,'cartitems':cartItems }
     return render(request,'store/cart.html',context)
 
 
@@ -26,10 +38,11 @@ def checkout (request):
         customer = request.user.customer
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all()
+        cartItems = order.finalItemNum  
     else :
         items=[]
-    
-    context = {'items':items ,'order':order}
+        cartItems = order.finalItemNum  
+    context = {'items':items ,'order':order,'cartitems':cartItems}
     
     return render(request,'store/checkout.html',context)
 
