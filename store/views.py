@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from .models import *
 from django.http import JsonResponse
-import json
+import json 
+import datetime
+
+from django.contrib.auth.forms import UserCreationForm
 # Create your views here.
 
 def store (request):
@@ -13,7 +16,8 @@ def store (request):
         cartItems = order.finalItemNum  
     else :
         items=[] 
-        cartItems = order.finalItemNum  
+        order = {'finalPrice':0 ,'finalItemNum':0}
+        cartItems = order['finalItemNum']
 
     Products = Product.objects.all()
     context = {'products': Products , 'cartitems':cartItems}
@@ -26,8 +30,9 @@ def cart (request):
         items = order.orderitem_set.all()
         cartItems = order.finalItemNum  
     else :
-        items=[]
-        order = []
+        items=[] 
+        order = {'finalPrice':0 ,'finalItemNum':0}
+        cartItems = order['finalItemNum']
     
     context = {'items':items ,'order':order ,'cartitems':cartItems }
     return render(request,'store/cart.html',context)
@@ -40,8 +45,9 @@ def checkout (request):
         items = order.orderitem_set.all()
         cartItems = order.finalItemNum  
     else :
-        items=[]
-        cartItems = order.finalItemNum  
+        items=[] 
+        order = {'finalPrice':0 ,'finalItemNum':0}
+        cartItems = order['finalItemNum']
     context = {'items':items ,'order':order,'cartitems':cartItems}
     
     return render(request,'store/checkout.html',context)
@@ -67,3 +73,32 @@ def updateItem(request):
     if orderItem.quantity <= 0:
         orderItem.delete()
     return JsonResponse('Item was added',safe=False)
+
+def processOrder(request):
+    data = json.loads(request.body)
+    
+    transaction_id = datetime.datetime.now().timestamp()
+
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order,created=Order.objects.get_or_create(customer=customer,complete=False)
+        total = float(data['form']['total'])
+        order.transaction_id = transaction_id
+        if total ==order.finalPrice:
+            order.complete = True
+        order.save()
+    else:
+        print('user not authenticated')
+    return JsonResponse('payment processed',safe=False)
+
+
+def register(request):
+    form = UserCreationForm()
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+    
+    context = {'form':form}
+    return render(request,'store/register.html',context)

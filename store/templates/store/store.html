@@ -1,16 +1,25 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load tz %}
+
 {% block content %}
     <div  class ="row">
     {% for product in products  %}
-        <div class="col-lg-4">
-            <img class ="thumbnail" src="{{ product.imageURL }}"  />
-            <div class="box-element product">
-                <h6><strong>{{ product.name }} </strong></h6>
-                <hr>
+        <div class="col-lg-4" >
+           
+            <div class="box-element product card "  >
+                <img class ="card-img-top thumbnail" src="{{ product.imageURL }}"  />
+                <div class="card-body">
+                <h6><strong>{{ product.name| truncatechars:50 }} </strong></h6>
+                <p><small>{{ product.description | truncatechars:50}} </small></p>
+                <hr >
+                
                 <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to cart</button>
                 <a class="btn btn-outline-success" href="#">view</a>
                 <h4 style="display: inline-block;float:right"><strong>${{product.price|floatformat:2}}</strong></h4>
+                <p class="product-date"><i>{{product.date |date:"j M Y G:i" }} </i></p>
+               
+                </div>
             </div>
         </div>
     {% endfor %}
