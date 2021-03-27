@@ -24,7 +24,7 @@ def store (request):
         cartItems = order['finalItemNum']
 
     Products = Product.objects.all()
-    context = {'products': Products , 'cartitems':cartItems}
+    context = {'products': Products , 'cartitems':cartItems,'isAuth':request.user.is_authenticated}
     return render(request,'store/store.html',context)
 
 def cart (request):
@@ -137,3 +137,8 @@ def loginPage(request):
     context = {}
     return render(request,'store/login.html',context)
     
+def logoutUser(request):
+    logout(request)
+    return redirect('store')
+
+

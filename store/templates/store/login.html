@@ -1,3 +1,5 @@
+{% extends 'store/main.html' %}
+{% block content %}
 <div>
 <form method="POST" action="">
 {% csrf_token %}
@@ -10,3 +12,8 @@
 </form>
 
 </div>
+
+
+
+
+{% endblock content %}

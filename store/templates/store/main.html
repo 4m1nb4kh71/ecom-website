@@ -53,15 +53,25 @@
               </li>
              
             </ul>
-            <h6 style="margin-right:10px">Welcome, {{request.user.username}}</h6>
-             <div class="form-inline my-2 my-lg-0">
-                
+            
+            {% if isAuth %}
+            <div >
+            
+            <h6 id = 'greet'> Welcome, {{request.user}} </h6>
+            <h7 ><a href={% url 'logout' %}> <img id="logout" src="{% static 'images/logout.png' %}"/></a></h7>
+            </div>
+            {% endif %}
+            
+             <div >
+                {% if isAuth == False %}
                 <a href="{% url 'login' %}"class="btn btn-outline-secondary">Login</a>
-                
+                {% elif isAuth %}
                 <a href="{% url 'cart' %}">
                   <img  id="cart-icon" src="{% static 'images/cart.png' %}"/>
                 </a>
                 <p id="cart-total">{{cartitems}}</p>
+                {% endif %}
+               
 
               </div>
           </div>

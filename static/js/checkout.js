@@ -3,7 +3,7 @@ var backtocart = document.getElementById('backtocart')
 var storeUrl =backtocart.dataset.storeurl
 var shipped = shipping.dataset.shipping
 var totprice = shipping.dataset.total
-
+var itemcount = shipping.dataset.itemcount
 if ( shipped == 'False' )
 {
     document.getElementById('shipping-info').innerHTML = ''
@@ -14,10 +14,21 @@ if(user != 'AnonymousUser')
     
 }
 
-if(shipped == 'False' && user != 'AnonymousUser')
+if(shipped == 'False' && user != 'AnonymousUser'  )
 {
-    document.getElementById('form-wrapper').classList.add('hidden')
-    document.getElementById('payment-info').classList.remove('hidden')
+    if(itemcount !='0')
+    {
+        document.getElementById('form-wrapper').classList.add('hidden')
+        document.getElementById('payment-info').classList.remove('hidden')
+    }
+   else
+   {
+        document.getElementById('form-wrapper').classList.add('hidden')
+        document.getElementById('payment-info').classList.remove('hidden')
+        document.getElementById('make-payment').classList.add('hidden')
+        document.getElementById('payment-info').innerHTML = '<p>No items in cart</p>'
+   }
+   
 }
 var form = document.getElementById('form')
 if(form != null){
@@ -29,10 +40,12 @@ if(form != null){
     })
 }
    
-
-document.getElementById('make-payment').addEventListener('click',(e)=>{
-    submitFormData()
-})
+if(document.getElementById('make-payment') != null){
+    document.getElementById('make-payment').addEventListener('click',(e)=>{
+        submitFormData()
+    })
+    
+}
 
 submitFormData = ()=>{
     console.log('data submited')
