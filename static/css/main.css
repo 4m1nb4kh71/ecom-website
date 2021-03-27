@@ -131,7 +131,7 @@ small{
 	justify-items: self-end;
 	align-items:end ;
 	margin:0px 0px 0px;
-	font-size: small;
+	font-size: medium;
 }
 .card-body {
 	padding:10px;

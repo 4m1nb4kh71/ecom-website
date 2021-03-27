@@ -8,10 +8,19 @@ class Customer (models.Model):
     email = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
     
 
+class Store(models.Model):
+
+    
+    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True)
+    storename = models.CharField(max_length=20)
+    def __str__(self):
+        return str(self.storename)
+
 class Product (models.Model):
+    store = models.ForeignKey(Store,on_delete=models.CASCADE,null=False,blank=False)
     name = models.CharField(max_length=200)
     price = models.FloatField()
     
@@ -29,9 +38,8 @@ class Product (models.Model):
         return url
 
     def __str__(self):
-        return self.name
+        return str(self.name)
     
-
 class Order(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True)
     date_ordered=models.DateField(auto_now_add=True)

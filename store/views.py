@@ -5,15 +5,19 @@ import json
 import datetime
 
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate , login,logout
+from django.shortcuts import redirect
 # Create your views here.
 
 def store (request):
 
     if (request.user.is_authenticated):
-        customer = request.user.customer
+        user = request.user
+        customer  = Customer.objects.get(user=user)
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all() 
-        cartItems = order.finalItemNum  
+        cartItems = order.finalItemNum
+         
     else :
         items=[] 
         order = {'finalPrice':0 ,'finalItemNum':0}
@@ -25,7 +29,9 @@ def store (request):
 
 def cart (request):
     if (request.user.is_authenticated):
-        customer = request.user.customer
+        user = request.user
+        customer  = Customer.objects.get(user=user)
+
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all()
         cartItems = order.finalItemNum  
@@ -40,7 +46,9 @@ def cart (request):
 
 def checkout (request):
     if (request.user.is_authenticated):
-        customer = request.user.customer
+        user = request.user
+        customer  = Customer.objects.get(user=user)
+
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all()
         cartItems = order.finalItemNum  
@@ -59,7 +67,9 @@ def updateItem(request):
     print('the action is :',action)
     print('the productId is :',productId)
 
-    customer = request.user.customer
+    user = request.user
+    customer  = Customer.objects.get(user=user)
+
     product = Product.objects.get(id=productId)
     order,created=Order.objects.get_or_create(customer=customer,complete=False)
     orderItem ,created = OrderItem.objects.get_or_create(order=order , product=product)
@@ -80,10 +90,16 @@ def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
 
     if request.user.is_authenticated:
-        customer = request.user.customer
-        order,created=Order.objects.get_or_create(customer=customer,complete=False)
+        user = request.user
+        customer  = Customer.objects.get(user=user)
+        order=Order.objects.get(customer=customer,complete=False)
+        items = order.orderitem_set.all() #the items in the order 
         total = float(data['form']['total'])
         order.transaction_id = transaction_id
+        print(customer.name + ' made a purchase of :')
+        for i in items:
+            print(i.product.name + ' from ' + i.product.store.storename)
+       
         if total ==order.finalPrice:
             order.complete = True
         order.save()
@@ -92,13 +108,32 @@ def processOrder(request):
     return JsonResponse('payment processed',safe=False)
 
 
-def register(request):
+def registerPage(request):
     form = UserCreationForm()
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            
             form.save()
-
+            return redirect('login')
+            
+           
     
     context = {'form':form}
     return render(request,'store/register.html',context)
+
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username,password=password)
+        print(username)
+        if user is not None:
+            login(request,user)
+            customer,created = Customer.objects.get_or_create(user=user,name=username)
+            customer.save()
+            return redirect('store')
+    context = {}
+    return render(request,'store/login.html',context)
+    
