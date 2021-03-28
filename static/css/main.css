@@ -38,11 +38,11 @@ small{
 #cart-icon{
 	width:25px;
 	display: inline-block;
-	transition: width .7s;
+	transition: width .4s;
 }
 #cart-icon:hover{
 	width:30px;
-	transition: width .7s;
+	transition: width .4s;
 }
 
 #cart-total{
@@ -152,10 +152,12 @@ small{
 	display: inline-block;
 	margin-right: 15px;
 	margin-right: 10px;
+	transition: width .4s;
 	 
 }
 #logout:hover{
-	
+	width:25px;
+	transition: width .4s;
 	opacity: .7;
 	 
 }

@@ -12,9 +12,7 @@ class Customer (models.Model):
     
 
 class Store(models.Model):
-
-    
-    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True)
+    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=False)
     storename = models.CharField(max_length=20)
     def __str__(self):
         return str(self.storename)

@@ -3,10 +3,12 @@ from .models import *
 from django.http import JsonResponse
 import json 
 import datetime
+from django import forms
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate , login,logout
 from django.shortcuts import redirect
+from .forms import ProductForm
 # Create your views here.
 
 def store (request):
@@ -139,6 +141,48 @@ def loginPage(request):
     
 def logoutUser(request):
     logout(request)
+    
     return redirect('store')
 
 
+def page(request):
+    if (request.user.is_authenticated):
+        user = request.user
+        customer  = Customer.objects.get(user=user)
+        stores = Store.objects.filter(customer=customer)
+        
+
+        #these two lines of code were switched and made my life hell on earth holyshit
+        form = ProductForm()
+        form.fields['store'].queryset = stores
+        products = []
+        if request.method == 'POST':
+            #print('printing POST : ',request.POST)
+            form = ProductForm(request.POST,request.FILES)
+            if form.is_valid():
+                form.save()
+                
+       
+       
+
+        if   stores.count == 0:
+            print('cool')
+
+            
+        else:
+            
+            for s in stores : 
+                products = s.product_set.all()
+
+        order , created = Order.objects.get_or_create(customer=customer,complete=False)
+        items = order.orderitem_set.all() 
+        cartItems = order.finalItemNum
+      
+    else:
+        return redirect('login')
+    context={'form':form,'stores':stores,'products':products,'isAuth':request.user.is_authenticated, 'cartitems':cartItems,}
+    return render(request, 'store/page.html',context)
+
+def addproduct(request):
+    
+    return JsonResponse('product added',safe=False)
