@@ -12,7 +12,7 @@ class Customer (models.Model):
     
 
 class Store(models.Model):
-    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=False)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,null=False,blank=False)
     storename = models.CharField(max_length=20)
     def __str__(self):
         return str(self.storename)
@@ -47,14 +47,22 @@ class Order(models.Model):
     @property
     def finalPrice(self):
         orderitems = self.orderitem_set.all()
-        finPrice = sum([item.totPrice for item in orderitems])
+        finPrice = 0
+        for item in orderitems :
+            if item.product !=None:
+                finPrice +=item.totPrice
+        
         finPrice = round(finPrice,2)
         return finPrice 
 
     @property
     def finalItemNum(self):
         orderitems = self.orderitem_set.all()
-        finNum = sum([item.quantity for item in orderitems])
+        finNum = 0 
+        for item in orderitems:
+            if item.product !=None:
+                finNum += item.quantity
+        
 
         return finNum
 
@@ -63,8 +71,9 @@ class Order(models.Model):
         shipping = False
         orderitems = self.orderitem_set.all()
         for i in orderitems :
-            if i.product.digital == False:
-                shipping = True
+            if i.product !=None: 
+                if i.product.digital == False:
+                    shipping = True
         return shipping
 
     def __str__(self):
@@ -80,9 +89,10 @@ class OrderItem(models.Model):
 
     @property
     def totPrice (self):
-        price = round(self.quantity * self.product.price,2)
-        
-        return price
+        if self.product != None:
+            price = round(self.quantity * self.product.price,2)
+            
+            return price
     
     
 class ShippingAddress(models.Model):

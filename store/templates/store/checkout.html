@@ -65,14 +65,21 @@
                 <h3>Order summary</h3>
                 <hr>
                 {% for item in items %}
-                
+                {% if item.product != None %}
                 <div class="cart-row">
                     <div style="flex:2"><img class="row-image" src ={{item.product.imageURL}}/> </div>
                     <div style="flex:2"><p>{{item.product.name}}</p></div>
                     <div style="flex:1"><p>${{item.product.price}}</p></div>
                     <div style="flex:1"><p>x{{item.quantity}}</p></div>  
                 </div>
-                
+                {% else %}
+                <div class="cart-row">
+                   
+                    <div style="flex:2"><p>product removed</p></div>
+                    <div style="flex:1"><p>$</p></div>
+                    <div style="flex:1"><p>x</p></div>  
+                </div>
+                {% endif %}
                 {% endfor %}
                 
                 <h5>Items:  {{order.finalItemNum}}</h5>

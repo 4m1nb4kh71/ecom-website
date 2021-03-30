@@ -9,14 +9,15 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate , login,logout
 from django.shortcuts import redirect
 from .forms import ProductForm
+from .forms import StoreForm
 # Create your views here.
 
 def store (request):
 
     if (request.user.is_authenticated):
         user = request.user
-        customer  = Customer.objects.get(user=user)
-        order , created = Order.objects.get_or_create(customer=customer,complete=False)
+        customer, created  = Customer.objects.get_or_create( user=user , name = user.username)
+        order ,created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all() 
         cartItems = order.finalItemNum
          
@@ -66,24 +67,34 @@ def updateItem(request):
     data = json.loads(request.body)
     productId= data['productId']
     action = data['action']
+    
     print('the action is :',action)
     print('the productId is :',productId)
 
     user = request.user
     customer  = Customer.objects.get(user=user)
+    if productId != '':
+        product = Product.objects.get(id=productId)
+        order,created=Order.objects.get_or_create(customer=customer,complete=False)
+        orderItem ,created = OrderItem.objects.get_or_create(order=order , product=product)
 
-    product = Product.objects.get(id=productId)
-    order,created=Order.objects.get_or_create(customer=customer,complete=False)
-    orderItem ,created = OrderItem.objects.get_or_create(order=order , product=product)
+    
+        if action == 'add':
+            orderItem.quantity = (orderItem.quantity + 1 )
+        elif action =='remove':
+            orderItem.quantity = (orderItem.quantity - 1 )
+        orderItem.save()
 
+        if orderItem.quantity <= 0:
+            orderItem.delete()
 
-    if action == 'add':
-        orderItem.quantity = (orderItem.quantity + 1 )
-    elif action =='remove':
-        orderItem.quantity = (orderItem.quantity - 1 )
-    orderItem.save()
-    if orderItem.quantity <= 0:
-        orderItem.delete()
+    #this to delet the orderitem that has products removed
+    if action =='removeOrder':
+        item = data['item']
+        itemr = OrderItem.objects.get(id=item)
+
+        print(itemr)
+        itemr.delete()
     return JsonResponse('Item was added',safe=False)
 
 def processOrder(request):
@@ -150,29 +161,58 @@ def page(request):
         user = request.user
         customer  = Customer.objects.get(user=user)
         stores = Store.objects.filter(customer=customer)
+        print(user)
+       
+        storeform = StoreForm(initial={'customer':customer},customer=user)
+        #initcutomer = storeform.fields['customer'].queryset.filter(name=customer.name)
+        #storeform.fields['customer'].queryset= initcutomer
         
-
         #these two lines of code were switched and made my life hell on earth holyshit
-        form = ProductForm()
-        form.fields['store'].queryset = stores
+        productform = ProductForm(customer=customer)
+        productform.fields['store'].queryset = stores
         products = []
         if request.method == 'POST':
             #print('printing POST : ',request.POST)
-            form = ProductForm(request.POST,request.FILES)
-            if form.is_valid():
-                form.save()
-                
-       
-       
+           
+            if request.POST.get('addstore'):
+                storeform = StoreForm(user,request.POST)
+                if storeform.is_valid():
+                    storeform.save()
+                else :
+                    print('not VALID FORGOT SOMTHING')
 
+            elif request.POST.get('deletestore'):
+                print('storedeleted')
+                print(request.POST.get('storekey'))
+                sk = request.POST.get('storekey')
+                Store.objects.filter(pk=sk).delete()
+            ### this to add products 
+
+            elif request.POST.get('addproduct'):
+                productform=ProductForm(customer,request.POST,request.FILES)
+                if productform.is_valid():
+                    productform.save()
+                
+            
+
+            ### this to delete products 
+            print(request.POST.get('key'))
+            key = request.POST.get('key')
+            Product.objects.filter(pk =key).delete()
+
+        ## Resets the stores field
+       # storeform.fields['customer'].queryset=initcutomer
+        #storeform = StoreForm(initial={'customer':customer})
+        #productform.fields['store'].queryset = stores
         if   stores.count == 0:
             print('cool')
 
             
         else:
             
-            for s in stores : 
-                products = s.product_set.all()
+            for s in stores :
+                print(s.pk) 
+                products += s.product_set.all()
 
         order , created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitem_set.all() 
@@ -180,7 +220,7 @@ def page(request):
       
     else:
         return redirect('login')
-    context={'form':form,'stores':stores,'products':products,'isAuth':request.user.is_authenticated, 'cartitems':cartItems,}
+    context={'productform':productform,'stores':stores,'products':products,'isAuth':request.user.is_authenticated, 'cartitems':cartItems,'storeform':storeform}
     return render(request, 'store/page.html',context)
 
 def addproduct(request):

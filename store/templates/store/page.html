@@ -1,19 +1,78 @@
 {% extends 'store/main.html' %}
+{% load static %}
 {% block content %}
 
-{% for store in stores  %}
-<p>{{store.storename}}</p>
+<div class="row">
+    <div class="col">
+        <div class="row>">
+            <div class="box-element" id="list-wrapper">
+            <form action="" method = "POST">
+            {% csrf_token %} 
+            <div class="hidden">{{storeform.customer}}</div>
+            {{storeform.storename}}
+            <input type ="submit" name="addstore" value='addstore' class='btn btn-outline-secondary' style="display:inline-block;float:right">
+            
+            </form>
+            </div>
+        </div>
 
-{% endfor %}
 
-{% for p in products %}
-<p><b> {{p.name}}</b><p>
-{% endfor %}
-<form action="" method = "POST" enctype="multipart/form-data">
-{% csrf_token %} 
-{{form}}
-<input type ="submit" name="submit">
 
-</form>
+        <div "row">
+            <div class="box-element" id="list-wrapper">
+
+                {% for store in stores  %}
+                <div class="box-element">
+                <form method="POST" style="display:inline">
+                 {% csrf_token %} 
+                    <p  style="display:inline-block;">{{store.storename}}</p>
+                    <input type ="hidden" name ="storekey" value={{store.pk}}>
+                    <input type ="submit" name="deletestore" value='delete' class='btn btn-outline-secondary' style="display:inline-block;float:right"/>
+                </form>
+                
+                    {% for p in products %}
+                    {% if p.store == store %}
+                    <div class="box-element">
+                        <form action="" method = "POST" >
+                        {% csrf_token %} 
+                            
+                            
+                            <p>
+                            <b> {{p.name}} </b>
+                            <input type ="hidden" name ="key" value={{p.pk}}>
+                            <input class='btn btn-outline-danger' type ="submit"value ="X" name="delete">
+                            </p>
+                            
+                        </form>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+            
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col">
+        <div class="box-element" id="form-wrapper">
+
+            <form action="" method = "POST" enctype="multipart/form-data">
+
+                {% csrf_token %} 
+                {{productform.as_p}}
+                <input type ="submit" name="addproduct" value='Add Product' class='form-control'>
+
+            </form>
+         </div>
+
+    </div>
+
+
+</div>
+
 
 {% endblock content %}

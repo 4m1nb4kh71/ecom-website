@@ -170,3 +170,11 @@ small{
 	cursor: pointer;
 	color:rgb(224, 203, 79); 
 }
+label,li,ul {
+	color: #ececec;
+}
+.btn-outline-danger{
+	display: inline-block;
+	float:right;
+	
+}
