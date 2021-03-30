@@ -6,8 +6,9 @@ for(i=0;i<updateBtns.length;i++)
     updateBtns[i].addEventListener('click', (e)=>{
         var productId=e.target.dataset.product
         var action = e.target.dataset.action
+        var item = e.target.dataset.item
         
-        console.log('productId:',productId,'action:',action)
+        console.log('productId:',productId,'action:',action,'itemid:',item)
         console.log('user:',user)
         if(user === 'AnonymousUser')
         {
@@ -17,14 +18,14 @@ for(i=0;i<updateBtns.length;i++)
         {
             
 
-            updateUserOrder (productId , action )
+            updateUserOrder (productId , action ,item )
            
         }
 
     })
 }
 
-function updateUserOrder (productId , action )
+function updateUserOrder (productId , action,item )
             {
                 console.log("user logged in... ")
                 var url = '/updateitem/'
@@ -37,7 +38,7 @@ function updateUserOrder (productId , action )
                             'Content-Type':'application/json',
                             'X-CSRFToken':csrftoken
                         },
-                        body:JSON.stringify({'productId':productId,'action':action}),
+                        body:JSON.stringify({'productId':productId,'action':action,'item':item}),
                         
                     },
                     

@@ -45,21 +45,35 @@
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
+         
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <a class="nav-link active" aria-current="page" href="{% url 'page' %}">Home</a>
               </li>
              
             </ul>
-             <div class="form-inline my-2 my-lg-0">
-                <a href="#"class="btn btn-outline-secondary">Login</a>
-                
-                <a href="{% url 'cart' %}">
+            
+            {% if isAuth %}
+            <div >
+            
+            <h6 id = 'greet'> Welcome, {{request.user}} </h6>
+            <h7 ><a href={% url 'logout' %}> <img id="logout" src="{% static 'images/logout.png' %}"/></a></h7>
+            </div>
+            <a href="{% url 'cart' %}">
                   <img  id="cart-icon" src="{% static 'images/cart.png' %}"/>
                 </a>
                 <p id="cart-total">{{cartitems}}</p>
-
+            {% elif isAuth == False %}
+                 <a href="{% url 'login' %}"class="btn btn-outline-secondary">Login</a>
+            {% endif %}
+            
+             <div >
+               
+               
+                
+                
+                
               </div>
           </div>
         </div>
@@ -75,6 +89,6 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
         <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
-        
+       
     </body>
 </html>
